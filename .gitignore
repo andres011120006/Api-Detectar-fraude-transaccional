@@ -1,0 +1,19 @@
+# Entorno virtual
+.venv/
+venv/
+env/
+
+# Caché de Python y testing
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+.coverage
+
+# Variables de entorno secretas
+.env
+
+# Datasets pesados o temporales
+data/transactions.csv
+
+# NOTA: NO agregamos src/model.joblib para que el modelo entrenado  se suba a GitHub

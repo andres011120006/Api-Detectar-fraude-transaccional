@@ -1,0 +1,24 @@
+# syntax=docker/dockerfile:1
+# AWS Lambda container image (ECR). Handler: src.app.handler (Mangum).
+
+# ---------- Stage 1: install deps + train the model ----------
+FROM public.ecr.aws/lambda/python:3.11 AS builder
+
+ENV PIP_NO_CACHE_DIR=1 PIP_DISABLE_PIP_VERSION_CHECK=1
+WORKDIR /build
+
+COPY requirements.txt .
+RUN pip install -r requirements.txt --target /deps
+
+COPY src ./src
+COPY data ./data
+COPY train.py .
+RUN PYTHONPATH=/deps python train.py
+
+# ---------- Stage 2: Lambda runtime ----------
+FROM public.ecr.aws/lambda/python:3.11
+
+COPY --from=builder /deps ${LAMBDA_TASK_ROOT}/
+COPY --from=builder /build/src ${LAMBDA_TASK_ROOT}/src
+
+CMD ["src.app.handler"]
